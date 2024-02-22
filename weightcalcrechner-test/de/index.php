@@ -4,7 +4,7 @@ $weightcalc = include_once '../../config/weightcalc.php';
 
 $materials = $weightcalc['material']['translate']['de'];
 $bulkMetric = $weightcalc['material']['values']['metric'];
-$bulkImperial = $weightcalc['material']['values']['imperial'];
+//$bulkImperial = $weightcalc['material']['values']['imperial'];
 //echo '<pre>';
 //var_dump($bulk);
 //echo '</pre>';
@@ -34,6 +34,7 @@ $bulkImperial = $weightcalc['material']['values']['imperial'];
 
                         <div class="card-body">
                             <form class="" id="calcBlocks" method="POST" action="../requests/rechner.php">
+                                <?php /*
                                 <input type="hidden" name="unit-tumbler" class="js-unit-tumbler" value="1">
 
                                 <div class="border-bottom pb-2">
@@ -51,7 +52,7 @@ $bulkImperial = $weightcalc['material']['values']['imperial'];
                                         </div>
                                     </div>
                                 </div>
-
+                                */ ?>
                                 <div id="form-blk">
                                     <div class="row border-bottom mb-2 pb-2">
                                         <h4 class="mt-2">Platte <span>1</span></h4>
@@ -59,37 +60,47 @@ $bulkImperial = $weightcalc['material']['values']['imperial'];
                                         <div class="col-6">
                                             <div>
                                                 <label class="form-label">Material</label>
-                                                <select class="form-control js-material">
+                                                <select class="form-control js-material" onchange="changeMaterial(this)">
                                                     <?php
-                                                    foreach ($materials as $key => $material) {
-                                                        echo "<option value='$key' data-density='$bulkMetric[$key]' data-type='metric' class=''>$material</option>";
-                                                        echo "<option value='$key' data-density='$bulkImperial[$key]' data-type='imperial' class='d-none'>$material</option>";
-                                                    }
+                                                        foreach ($materials as $key => $material) {
+                                                            echo "<option value='$key' data-density='$bulkMetric[$key]' data-type='metric' class=''>$material</option>";
+                                                            //echo "<option value='$key' data-density='$bulkImperial[$key]' data-type='imperial' class='d-none'>$material</option>";
+                                                        }
                                                     ?>
                                                 </select>
                                             </div>
                                             <div>
                                                 <label for="length" class="form-label">Länge in <span class="js-mm-inch">mm</span></label>
-                                                <input type="number" class="form-control js-input-field js-length" name="length" id="length" placeholder="z.B. 400" data-place-metric="z.B. 400" data-place-imperial="z.B. 16">
+                                                <input type="number" class="form-control js-input-field js-length" name="length[1]" id="length" placeholder="z.B. 400" data-place-metric="z.B. 400" data-place-imperial="z.B. 16">
                                             </div>
                                             <div>
                                                 <label for="width" class="form-label">Breite in <span class="js-mm-inch">mm</span></label>
-                                                <input type="number" class="form-control js-input-field js-width" name="width" id="width" placeholder="z.B. 500" data-place-metric="z.B. 500" data-place-imperial="z.B. 20">
+                                                <input type="number" class="form-control js-input-field js-width" name="width[1]" id="width" placeholder="z.B. 500" data-place-metric="z.B. 500" data-place-imperial="z.B. 20">
                                             </div>
                                             <div>
                                                 <label for="strength" class="form-label">Stärke in <span class="js-mm-inch">mm</span></label>
-                                                <input type="number" class="form-control js-input-field js-strength" name="strength" id="strength" placeholder="z.B. 19" data-place-metric="z.B. 19" data-place-imperial="z.B. 0.50">
+                                                <input type="number" class="form-control js-input-field js-strength" name="strength[1]" id="strength" placeholder="z.B. 19" data-place-metric="z.B. 19" data-place-imperial="z.B. 0.50">
                                             </div>
                                         </div>
 
                                         <div class="col-6">
                                             <div>
                                                 <label for="bulk" class="form-label">Rohdichte in <span class="js-m3-gal">kg/m³</span></label>
-                                                <input type="number" class="form-control js-input-field js-density" name="density" placeholder="z.B. 1000" data-place-metric="z.B. 1000" data-place-imperial="z.B. 10">
+                                                <input type="number" class="form-control js-input-field js-density" name="density[1]" placeholder="z.B. 1000" data-place-metric="z.B. 1000" data-place-imperial="z.B. 10">
                                             </div>
 
                                             <div class="alert alert-secondary mt-4">
                                                 *Achtung: Aufgrund von Schwankungen in den Rohdichten verschiedener Platten-Hersteller, kann das hier berechnete Gewicht vom tatsächlichen Gewicht abweichen. Passen Sie ggf. die Rohdichte manuell an.'
+                                            </div>
+
+                                            <div class="js-weight-blk-all js-weight-blk-1 text-end d-none">
+                                                <span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bag-fill mb-3" viewBox="0 0 16 16">
+                                                      <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4z"/>
+                                                    </svg>
+                                                </span>
+                                                <span class="total-weight">0.00</span>
+                                                <span class="js-kg-lb">kg</span>
                                             </div>
                                         </div>
                                     </div>
@@ -103,7 +114,10 @@ $bulkImperial = $weightcalc['material']['values']['imperial'];
                                 </div>
 
                                 <div class="row fs-3">
-                                    <div class="col-12 text-end">
+                                    <div class="col-3 text-start">
+                                        <button type="submit" class="btn btn-primary">Berechnen</button>
+                                    </div>
+                                    <div class="col-9 text-end">
                                         <span>
                                             Gesamtgewicht*
                                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bag-fill mb-3" viewBox="0 0 16 16">
@@ -134,37 +148,47 @@ $bulkImperial = $weightcalc['material']['values']['imperial'];
                 <div class="col-6">
                     <div>
                         <label class="form-label">Material</label>
-                        <select class="form-control js-material">
+                        <select class="form-control js-material" onchange="changeMaterial(this)">
                             <?php
-                            foreach ($materials as $key => $material) {
-                                echo "<option value='$key' data-density='$bulkMetric[$key]' data-type='metric' class=''>$material</option>";
-                                echo "<option value='$key' data-density='$bulkImperial[$key]' data-type='imperial' class='d-none'>$material</option>";
-                            }
+                                foreach ($materials as $key => $material) {
+                                    echo "<option value='$key' data-density='$bulkMetric[$key]' data-type='metric' class=''>$material</option>";
+//                                    echo "<option value='$key' data-density='$bulkImperial[$key]' data-type='imperial' class='d-none'>$material</option>";
+                                }
                             ?>
                         </select>
                     </div>
                     <div>
                         <label for="length" class="form-label">Länge in <span class="js-mm-inch">mm</span></label>
-                        <input type="number" class="form-control js-input-field js-length" name="length" id="length" placeholder="z.B. 400" data-place-metric="z.B. 400" data-place-imperial="z.B. 16">
+                        <input type="number" class="form-control js-input-field js-length" name="length[0]" id="length" placeholder="z.B. 400" data-place-metric="z.B. 400" data-place-imperial="z.B. 16">
                     </div>
                     <div>
                         <label for="width" class="form-label">Breite in <span class="js-mm-inch">mm</span></label>
-                        <input type="number" class="form-control js-input-field js-width" name="width" id="width" placeholder="z.B. 500" data-place-metric="z.B. 500" data-place-imperial="z.B. 20">
+                        <input type="number" class="form-control js-input-field js-width" name="width[0]" id="width" placeholder="z.B. 500" data-place-metric="z.B. 500" data-place-imperial="z.B. 20">
                     </div>
                     <div>
                         <label for="strength" class="form-label">Stärke in <span class="js-mm-inch">mm</span></label>
-                        <input type="number" class="form-control js-input-field js-strength" name="strength" id="strength" placeholder="z.B. 19" data-place-metric="z.B. 19" data-place-imperial="z.B. 0.50">
+                        <input type="number" class="form-control js-input-field js-strength" name="strength[0]" id="strength" placeholder="z.B. 19" data-place-metric="z.B. 19" data-place-imperial="z.B. 0.50">
                     </div>
                 </div>
 
                 <div class="col-6">
                     <div>
                         <label for="bulk" class="form-label">Rohdichte in <span class="js-m3-gal">kg/m³</span></label>
-                        <input type="number" class="form-control js-input-field js-density" name="density" placeholder="z.B. 1000" data-place-metric="z.B. 1000" data-place-imperial="z.B. 10">
+                        <input type="number" class="form-control js-input-field js-density" name="density[0]" placeholder="z.B. 1000" data-place-metric="z.B. 1000" data-place-imperial="z.B. 10">
                     </div>
 
                     <div class="alert alert-secondary mt-4">
                         *Achtung: Aufgrund von Schwankungen in den Rohdichten verschiedener Platten-Hersteller, kann das hier berechnete Gewicht vom tatsächlichen Gewicht abweichen. Passen Sie ggf. die Rohdichte manuell an.'
+                    </div>
+
+                    <div class="js-weight-blk-all text-end d-none">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bag-fill mb-3" viewBox="0 0 16 16">
+                                <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4z"/>
+                            </svg>
+                        </span>
+                        <span class="total-weight">0.00</span>
+                        <span class="js-kg-lb">kg</span>
                     </div>
                 </div>
             </div>

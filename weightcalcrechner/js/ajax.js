@@ -1,68 +1,95 @@
-$(function () {
-    //.form-check-input
-    function request(){
-        let data = $('#calcBlocks').serializeArray();
-        let url = $('#calcBlocks').attr('action');
 
-        $.ajax({
-            url: url,
-            data: data,
-            // async: false,
-            method: 'POST',
-            success: function (res){
-                let obj = JSON.parse(res);
-                console.log(res);
-                if(obj.success === 1){
-                    $('#totalWeight').html(obj.weight);
-                    // $('.js-unit-tumbler').val(obj.unitTumbler);
-                }
-            },
-            error: function (err){
-                console.log(err);
-            }
-        });
-    }
+function removeBlk(elem){
+    let blk = $(elem).parent().parent().parent();
 
-    function unitRecalc(){
-        // return new Promise((resolve, reject) => {
-            let data = $('#calcBlocks').serializeArray();
-            let url = '../requests/unit-recalc.php'
+    blk.remove();
 
-            $.ajax({
-                url: url,
-                data: data,
-                // async: false,
-                method: 'POST',
-                success: function (res){
-                    let obj = JSON.parse(res);
+    request();
+}
+function request(){
+    let data = $('#calcBlocks').serializeArray();
+    let url = $('#calcBlocks').attr('action');
 
-                    if(obj.success === 1){
-                        // $('#calcBlocks')[0].reset();
-                        //
-                        // $(`input[value="${obj.units}"]`).prop("checked", true);
-                        $('.js-density').val(obj.density);
-                        $('.js-length').val(obj.length);
-                        $('.js-width').val(obj.width);
-                        $('.js-strength').val(obj.strength);
+    let platteNum = $('.platte-num').length + 1;
 
-                        $('.js-unit-tumbler').val(obj.unitTumbler);
-                    }
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        success: function (res){
+            let obj = JSON.parse(res);
 
-                    // resolve('ok');
-                },
-                error: function (err){
-                    // reject('error');
-                }
+            $.each(obj.data,function(index, value){
+                $(`.js-weight-blk-${index + 1}`).find('.total-weight').html(value.weight);
             });
-        // });
+
+            $('#totalWeight').html(obj.weight.toFixed(2));
+
+            $.each(obj.errors, function(index, value){
+                $('.'+value).removeClass('d-none');
+            });
+            
+        },
+        error: function (err){
+            console.log(err);
+        }
+    });
+}
+
+$(function () {
+
+
+    // function unitRecalc(){
+    //     let data = $('#calcBlocks').serializeArray();
+    //     let url = '../requests/unit-recalc.php'
+
+    //     $.ajax({
+    //         url: url,
+    //         data: data,
+    //         method: 'POST',
+    //         success: function (res){
+    //             let obj = JSON.parse(res);
+
+    //             if(obj.success === 1){
+    //                 $('.js-density').val(obj.density);
+    //                 $('.js-length').val(obj.length);
+    //                 $('.js-width').val(obj.width);
+    //                 $('.js-strength').val(obj.strength);
+
+    //                 // $('.js-unit-tumbler').val(obj.unitTumbler);
+    //             }
+    //         },
+    //         error: function (err){
+    //             console.log(err)
+    //         }
+    //     });
+    // }
+
+    
+    // $('.form-control').focusout(function (e){
+    //     request();
+    // });
+
+    // $('#calcBlocks').submit(function (e) {
+    //     e.preventDefault();
+    //     request();
+    // });
+
+    // $('.form-check-input').change(function (e) {
+    //     unitRecalc()
+    //     request();
+    // })
+
+    function errorsClear(){
+        $.each($('.ci-form-error'), function(index, elem){
+            $(elem).addClass('d-none');
+        })
     }
 
-    $('.form-control').focusout(function (e){
-        request();
-    });
+    $('#calcBlocks').submit(function(e){
+        e.preventDefault();
 
-    $('.form-check-input').change(function (e) {
-        unitRecalc()//.then(request());
+        errorsClear();
         request();
     })
 })

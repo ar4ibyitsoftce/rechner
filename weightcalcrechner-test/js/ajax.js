@@ -1,68 +1,74 @@
+function removeBlk(elem){
+    let blk = $(elem).parent().parent().parent();
+
+    blk.remove();
+
+    request();
+}
+function request(){
+    let data = $('#calcBlocks').serializeArray();
+    let url = $('#calcBlocks').attr('action');
+
+    let platteNum = $('.platte-num').length + 1;
+
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        success: function (res){
+            let obj = JSON.parse(res);
+
+            $.each(obj.data,function(index, value){
+                $(`.js-weight-blk-${index + 1}`).find('.total-weight').html(value.weight);
+            });
+
+            $('#totalWeight').html(obj.weight.toFixed(2));
+        },
+        error: function (err){
+            console.log(err);
+        }
+    });
+}
 $(function () {
-    //.form-check-input
-    function request(){
+
+
+    function unitRecalc(){
         let data = $('#calcBlocks').serializeArray();
-        let url = $('#calcBlocks').attr('action');
+        let url = '../requests/unit-recalc.php'
 
         $.ajax({
             url: url,
             data: data,
-            // async: false,
             method: 'POST',
             success: function (res){
                 let obj = JSON.parse(res);
-                console.log(res);
+
                 if(obj.success === 1){
-                    $('#totalWeight').html(obj.weight);
+                    $('.js-density').val(obj.density);
+                    $('.js-length').val(obj.length);
+                    $('.js-width').val(obj.width);
+                    $('.js-strength').val(obj.strength);
+
                     // $('.js-unit-tumbler').val(obj.unitTumbler);
                 }
             },
             error: function (err){
-                console.log(err);
+                console.log(err)
             }
         });
     }
 
-    function unitRecalc(){
-        // return new Promise((resolve, reject) => {
-            let data = $('#calcBlocks').serializeArray();
-            let url = '../requests/unit-recalc.php'
+    // $('.form-control').focusout(function (e){
+    //     request();
+    // });
 
-            $.ajax({
-                url: url,
-                data: data,
-                // async: false,
-                method: 'POST',
-                success: function (res){
-                    let obj = JSON.parse(res);
-
-                    if(obj.success === 1){
-                        // $('#calcBlocks')[0].reset();
-                        //
-                        // $(`input[value="${obj.units}"]`).prop("checked", true);
-                        $('.js-density').val(obj.density);
-                        $('.js-length').val(obj.length);
-                        $('.js-width').val(obj.width);
-                        $('.js-strength').val(obj.strength);
-
-                        $('.js-unit-tumbler').val(obj.unitTumbler);
-                    }
-
-                    // resolve('ok');
-                },
-                error: function (err){
-                    // reject('error');
-                }
-            });
-        // });
-    }
-
-    $('.form-control').focusout(function (e){
+    $('#calcBlocks').submit(function (e) {
+        e.preventDefault();
         request();
     });
 
     $('.form-check-input').change(function (e) {
-        unitRecalc()//.then(request());
+        unitRecalc()
         request();
     })
 })

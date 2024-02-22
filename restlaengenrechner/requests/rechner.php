@@ -4,12 +4,28 @@ $outer = $_POST['outer-diameter'] ?? null;
 $inner = $_POST['inner-diameter'] ?? null;
 $edge = $_POST['edge-thickness'] ?? null;
 
-if((!$outer || $outer == 0)
-    || (!$inner || $inner == 0)
-    || (!$edge || $edge == 0)){
+if(!$outer || $outer == 0){
     echo json_encode([
         'success' => 0,
-        'text' => 'Füllen Sie alle Felder im Formular aus'
+        'error' => 'aussen-error'
+    ]);
+
+    exit(0);
+}
+
+if(!$inner || $inner == 0){
+    echo json_encode([
+        'success' => 0,
+        'error' => 'innen-error'
+    ]);
+
+    exit(0);
+}
+
+if(!$edge || $edge == 0){
+    echo json_encode([
+        'success' => 0,
+        'error' => 'dicke-error'
     ]);
 
     exit(0);
@@ -18,7 +34,7 @@ if((!$outer || $outer == 0)
 if($outer <= $inner){
     echo json_encode([
         'success' => 0,
-        'text' => 'Der Außendurchmesser muss größer sein als der Innendurchmesser'
+        'error' => 'size-error'
     ]);
 
     exit(0);

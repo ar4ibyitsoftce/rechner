@@ -1,7 +1,12 @@
-function removeBlk(elem){
-    let blk = $(elem).parent().parent().parent();
 
-    blk.remove();
+
+function changeMaterial(elem){
+    let select = $(elem).find(":selected");
+
+    let size = select.data('density');
+    let parentBlk = $(elem).parent().parent().parent().find('.js-density');
+
+    parentBlk.val(size);
 }
 $(function(){
     function changeUnitVals(type){
@@ -38,35 +43,51 @@ $(function(){
         });
     }
 
-    $('.js-material').change(function (){
-        let select = $(this).find(":selected");
+    // $('.js-material').change(function (){
+    //     let select = $(this).find(":selected");
+    //
+    //     let size = select.data('density');
+    //     let parentBlk = $(this).parent().parent().parent().find('.js-density');
+    //
+    //     parentBlk.val(size);
+    // });
 
-        let size = select.data('density');
-        let parentBlk = $(this).parent().parent().parent().find('.js-density');
-
-        parentBlk.val(size);
-    });
-
-    $('.js-unit').change(function (){
-        let unit = $(this).val();
-
-        if(unit === 'metric'){
-            changeUnitVals('metric');
-            changeUnitNames('metric');
-        } else {
-            changeUnitVals('imperial');
-            changeUnitNames('imperial');
-        }
-    })
+    // $('.js-unit').change(function (){
+    //     let unit = $(this).val();
+    //
+    //     if(unit === 'metric'){
+    //         changeUnitVals('metric');
+    //         changeUnitNames('metric');
+    //     } else {
+    //         changeUnitVals('imperial');
+    //         changeUnitNames('imperial');
+    //     }
+    // })
 
     $('#add-row-btn').click(function () {
         let templ = $('#platte-template').children();
 
+        let platteNum = $('.platte-num').length + 1;
+        templ.find('.platte-num').html(platteNum);
+
+        $('.js-weight-blk-all').each(function (k, elem) {
+            $(elem).removeClass('d-none');
+        })
+
+        let fields = templ.find('.js-input-field');
+        fields.each(function (k, elem) {
+            let oldName = $(elem).attr('name');
+            let oldPlatteNum = (platteNum === 2) ? 0 : platteNum - 1;
+            let newName = oldName.replace("["+oldPlatteNum+"]", `[${platteNum}]`);
+
+            //let platteWeightBlk =
+            templ.find('.js-weight-blk-all').addClass(`js-weight-blk-${platteNum}`);
+
+            $(elem).attr('name', newName);
+        });
+
         let clonedTmpl = templ.clone();
-
-
         $('#form-blk').append(clonedTmpl);
-
     });
 
 
